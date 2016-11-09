@@ -1,11 +1,11 @@
-
 typedef struct{
 	int compteur_lecteur;
-	int compteur_redacteur;
+	int lecteur_attend;
+	int donnee_disponible;
 	pthread_cond_t redacteur_ok;
+	pthread_cond_t redacteur_parti;
 	pthread_mutex_t mutex_donnee;
 	pthread_mutex_t mutex_compteur_lecteur;
-	pthread_mutex_t mutext_compteur_redacteur;
 }lecteur_redacteur_t;
 
 /**
