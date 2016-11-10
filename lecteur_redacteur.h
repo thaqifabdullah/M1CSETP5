@@ -1,7 +1,12 @@
+typedef enum priority_type{
+	LECTEUR, REDACTEUR, ORDRE_ARRIVE
+}priority_t;
+
 typedef struct{
 	int compteur_lecteur;
 	int lecteur_attend;
 	int donnee_disponible;
+	priority_t priority;
 	pthread_cond_t redacteur_ok;
 	pthread_cond_t redacteur_parti;
 	pthread_mutex_t mutex_donnee;
@@ -11,7 +16,7 @@ typedef struct{
 /**
 * L'initialisation des structures de synchronisation
 **/
-void initialiser_lecteur_redacteur(lecteur_redacteur_t *lr);
+void initialiser_lecteur_redacteur(lecteur_redacteur_t *lr, priority_t prio);
 
 /**
 * La fonction de destruction des structures de synchronisation

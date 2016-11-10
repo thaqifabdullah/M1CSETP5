@@ -64,20 +64,22 @@ int main(int argc, char *argv[]) {
     donnees_thread_t donnees_thread;
     int i, nb_lecteurs, nb_redacteurs;
     void *resultat;
+    priority_t prio;
 
-    if (argc < 4) {
+    if (argc < 5) {
         fprintf(stderr, "Utilisation: %s nb_lecteurs nb_redacteurs "
-                        "nb_iterations\n", argv[0]);
+                        "nb_iterations priority_type(0/1/2)\n", argv[0]);
         exit(1);
     }
 
     nb_lecteurs = atoi(argv[1]);
     nb_redacteurs = atoi(argv[2]);
     donnees_thread.iterations = atoi(argv[3]);
+    prio = atoi(argv[4]);
 
     threads = malloc((nb_lecteurs+nb_redacteurs)*sizeof(pthread_t));
     thread_courant = threads;
-    initialiser_lecteur_redacteur(&donnees_thread.lecteur_redacteur);
+    initialiser_lecteur_redacteur(&donnees_thread.lecteur_redacteur, prio);
 
     for (i=0; i<nb_lecteurs; i++)
         pthread_create(thread_courant++, NULL, lecteur, &donnees_thread);
