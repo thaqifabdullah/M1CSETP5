@@ -3,15 +3,27 @@ typedef enum priority_type{
 }priority_t;
 
 typedef struct{
+	int disponible;
+	pthread_mutex_t mutex;
+	pthread_cond_t cond;
+}semaphore_t;
+
+typedef struct{
 	int compteur_lecteur;
-	int lecteur_attend;
-	int donnee_disponible;
 	priority_t priority;
-	pthread_cond_t redacteur_ok;
-	pthread_cond_t redacteur_parti;
-	pthread_mutex_t mutex_donnee;
-	pthread_mutex_t mutex_compteur_lecteur;
+	semaphore_t donnee;
+	semaphore_t lecteur;
+	semaphore_t redacteur;
+	semaphore_t fin_lecteur;
 }lecteur_redacteur_t;
+
+void initialiser_semaphore(semaphore_t *sem, int token);
+
+void P(semaphore_t *sem);
+
+void V(semaphore_t *sem);
+
+void detruire_semaphore(semaphore_t *sem);
 
 /**
 * L'initialisation des structures de synchronisation
