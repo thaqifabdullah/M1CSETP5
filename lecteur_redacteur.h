@@ -10,11 +10,12 @@ typedef struct{
 
 typedef struct{
 	int compteur_lecteur;
+	int compteur_redacteur;
 	priority_t priority;
 	semaphore_t donnee;
 	semaphore_t lecteur;
 	semaphore_t redacteur;
-	semaphore_t fin_lecteur;
+	semaphore_t debut_lecteur;
 }lecteur_redacteur_t;
 
 void initialiser_semaphore(semaphore_t *sem, int token);

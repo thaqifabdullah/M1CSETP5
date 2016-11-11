@@ -33,18 +33,19 @@ void V(semaphore_t *sem){
 
 void initialiser_lecteur_redacteur(lecteur_redacteur_t *lr, priority_t prio){
 	lr->compteur_lecteur = 0;
+	lr->compteur_redacteur = 0;
 	lr->priority = prio;
 	initialiser_semaphore(&lr->donnee, 1);
 	initialiser_semaphore(&lr->lecteur, 1);
 	initialiser_semaphore(&lr->redacteur, 1);
-	initialiser_semaphore(&lr->fin_lecteur, 1);
+	initialiser_semaphore(&lr->debut_lecteur, 1);
 }
 
 void detruire_lecteur_redacteur(lecteur_redacteur_t *lr){
 	detruire_semaphore(&lr->donnee);
 	detruire_semaphore(&lr->lecteur);
 	detruire_semaphore(&lr->redacteur);
-	detruire_semaphore(&lr->fin_lecteur);
+	detruire_semaphore(&lr->debut_lecteur);
 }
 
 void debut_lecture(lecteur_redacteur_t *lr){
@@ -59,12 +60,14 @@ void debut_lecture(lecteur_redacteur_t *lr){
 			break;
 
 		case REDACTEUR:
+			P(&lr->debut_lecteur);
 			P(&lr->lecteur);
 			lr->compteur_lecteur++;
 			if(lr->compteur_lecteur == 1){
 				P(&lr->donnee);
 			}
 			V(&lr->lecteur);
+			V(&lr->debut_lecteur);
 			break;
 
 		case ORDRE_ARRIVE:
@@ -86,12 +89,12 @@ void fin_lecture(lecteur_redacteur_t *lr){
 			V(&lr->lecteur);
 			break;
 		case REDACTEUR:
-			P(&lr->fin_lecteur);
+			P(&lr->lecteur);
 			lr->compteur_lecteur--;
 			if(lr->compteur_lecteur == 0){
 				V(&lr->donnee);
 			}
-			V(&lr->fin_lecteur);
+			V(&lr->lecteur);
 			break;
 
 		case ORDRE_ARRIVE:
@@ -111,8 +114,12 @@ void debut_redaction(lecteur_redacteur_t *lr){
 			break;
 			
 		case REDACTEUR:
-			P(&lr->lecteur);
 			P(&lr->redacteur);
+			lr->compteur_redacteur++;
+			if(lr->compteur_redacteur == 1){
+				P(&lr->debut_lecteur);
+			}
+			V(&lr->redacteur);
 			P(&lr->donnee);
 			break;
 
@@ -133,8 +140,12 @@ void fin_redaction(lecteur_redacteur_t *lr){
 
 		case REDACTEUR:
 			V(&lr->donnee);
+			P(&lr->redacteur);
+			lr->compteur_redacteur--;
+			if(lr->compteur_redacteur == 0){
+				V(&lr->debut_lecteur);
+			}
 			V(&lr->redacteur);
-			V(&lr->lecteur);
 			break;
 
 		case ORDRE_ARRIVE:
