@@ -1,6 +1,17 @@
+typedef enum{
+	LECT, RED
+}lecteur_redacteur_type;
+
 typedef enum priority_type{
 	LECTEUR, REDACTEUR, ORDRE_ARRIVE
 }priority_t;
+
+typedef struct fifo_type{
+	pthread_cond_t cond;
+	lecteur_redacteur_type LR;
+	struct fifo_type *next;
+	int id;
+}fifo_t;
 
 typedef struct{
 	int disponible;
@@ -16,7 +27,15 @@ typedef struct{
 	semaphore_t lecteur;
 	semaphore_t redacteur;
 	semaphore_t debut_lecteur;
+	semaphore_t fifo;
+	pthread_mutex_t mutex;
+	fifo_t *file;
+	fifo_t *iter;
+	int disponible;
+	int disponible_redacteur;
 }lecteur_redacteur_t;
+
+void initialiser_fifo(fifo_t *fifo);
 
 void initialiser_semaphore(semaphore_t *sem, int token);
 
